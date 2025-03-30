@@ -1,4 +1,4 @@
-import os, sys, re, subprocesss, json, string, logging, asyncio 
+.import os, sys, re, subprocesss, json, string, logging, asyncio 
 import platform
 import socket
 import ipaddress
@@ -22,6 +22,8 @@ When you run the script, it will create the database and table if they do not ex
 You can expand or modify the schema of the table as needed based on your specific requirements for the results you plan to store.
 """
 
+''' self.log_event is a python built in function that we will define inside the classs, thatway the code doesnt 
+get messy down the line '''
 
 #-------logs------
 
