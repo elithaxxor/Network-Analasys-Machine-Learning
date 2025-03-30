@@ -1,26 +1,28 @@
-import asyncio
-import os
-import re
-import sys
-import logging
-import subprocess
-import json
+import os, sys, re, subprocesss, json, string, logging, asyncio 
 import platform
 import socket
 import ipaddress
 import random
-import string
 import aiofiles
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, Set, Union, Tuple
+from typing import List, Dict, Any, Optional, Set, Union, Tuple # statically typed implimentation,since we are working with several languages, this may be Necessary
 from datetime import datetime
 from enum import Enum
+import sqlite3
 
+"""
+** Creating the Database and Table:
+The create_database function connects to an SQLite database specified by db_name. If the database doesn't exist, it will be created.
+It then creates a table called results with columns for id, name, score, and date. The id is an auto-incrementing primary key.
+** Uploading Results:
+The upload_result function allows for inserting results into the results table. It accepts the database name, the person's name, and their score as parameters.
+It uses a parameterized query to safely insert the data into the database.
+** Example Usage:
+When you run the script, it will create the database and table if they do not exist and upload some sample results.
+You can expand or modify the schema of the table as needed based on your specific requirements for the results you plan to store.
+"""
 
 #------ DB ------ 
-To create an SQLite database and table to upload results, we can write a Python script that initializes the database and creates the necessary table structure. Here's an example of how you can refactor your code to accomplish this:
-
-import sqlite3
 
 # Function to create a SQLite database and a results table
 def create_database(db_name):
@@ -29,6 +31,7 @@ def create_database(db_name):
     cursor = conn.cursor()
     
     # Create a table named 'results' with appropriate columns
+    # id paramater auto increments, mitigating locking issues. 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,18 +68,6 @@ if __name__ == "__main__":
     # Uploading some sample results
     upload_result(db_name, 'Alice', 95)
     upload_result(db_name, 'Bob', 87)
-Explanation of the Code:
-
-Creating the Database and Table:
-The create_database function connects to an SQLite database specified by db_name. If the database doesn't exist, it will be created.
-It then creates a table called results with columns for id, name, score, and date. The id is an auto-incrementing primary key.
-Uploading Results:
-The upload_result function allows for inserting results into the results table. It accepts the database name, the person's name, and their score as parameters.
-It uses a parameterized query to safely insert the data into the database.
-Example Usage:
-When you run the script, it will create the database and table if they do not exist and upload some sample results.
-You can expand or modify the schema of the table as needed based on your specific requirements for the results you plan to store.
-
     
 
 # ---- Tool Description Utility ----
