@@ -182,3 +182,40 @@ Client-Side Security Insights: JavaScript analysis can reveal sensitive informat
 Hidden Endpoint Discovery: Undocumented APIs often lack proper security controls
 Logical Integration: Fits naturally alongside our existing reconnaissance capabilities.
 Works well inconjunction with my **web-walker** and **html-parser**
+
+
+
+To create a database in SQLite and upload data into it, you can follow these steps:
+
+1. **Install SQLite**: Ensure that SQLite is installed on your computer. You can download it from the official SQLite website.
+
+2. **Create a Database**:
+   - Open your command line or terminal.
+   - Type the command `sqlite3 your_database_name.db` to create a new database. Replace `your_database_name.db` with your preferred database name. This command opens an SQLite prompt.
+
+3. **Create a Table**: Within the SQLite prompt, use SQL commands to create a table. For example:
+   ```sql
+   CREATE TABLE your_table_name (
+       id INTEGER PRIMARY KEY,
+       name TEXT,
+       age INTEGER
+   );
+   ```
+   Replace `your_table_name`, `name`, and `age` with your desired table name and column names.
+
+4. **Insert Data**: To upload data into the table, use the INSERT statement. For example:
+   ```sql
+   INSERT INTO your_table_name (name, age) VALUES ('Alice', 30);
+   INSERT INTO your_table_name (name, age) VALUES ('Bob', 25);
+   ```
+
+5. **Exit SQLite**: Type `.exit` to close the SQLite prompt when you're done.
+
+6. **Verify Data**: You can check if the data was uploaded successfully by running:
+   ```sql
+   SELECT * FROM your_table_name;
+   ```
+
+These steps outline the basic process of creating a SQLite database and uploading data to it.
+
+
