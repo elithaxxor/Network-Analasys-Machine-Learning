@@ -22,8 +22,135 @@ When you run the script, it will create the database and table if they do not ex
 You can expand or modify the schema of the table as needed based on your specific requirements for the results you plan to store.
 """
 
-#------ DB ------ 
 
+#-------logs------
+
+class NetworkAnalyzer:
+    def __init__(self):
+        # Configure logging (adjust the configuration as needed)
+        logging.basicConfig(level=logging.INFO)
+        self.log_event("info", "NetworkAnalyzer initialized.")
+        # TODO: Upload an initialization log to the DB.
+        # Reason: Log the start of the analyzer to track system startups and configuration events.
+        # upload_log({"event": "init", "message": "NetworkAnalyzer initialized."})
+
+    def log_event(self, level, message, data=None):
+        """
+        Logs an event using Python's logging module and optionally uploads it to the database.
+        log_event Method:
+        **** This new method centralizes logging within the class. It accepts a log level, a message, and optional data. 
+        In one place, you can manage both the logging to the console (or a file) and the subsequent uploading of log events to your database.
+        Parameters:
+            level (str): The level of logging ('info', 'error', 'debug', etc.).
+            message (str): The log message.
+            data (dict, optional): Additional contextual data to be logged/uploaded.
+        """
+        if level.lower() == "info":
+            logging.info(message)
+        elif level.lower() == "error":
+            logging.error(message)
+        elif level.lower() == "debug":
+            logging.debug(message)
+        else:
+            logging.info(message)
+
+        logging.info(
+
+        # TODO: Upload the log to the DB along with additional data if provided.
+        # Reason: Centralizing the logging and uploading ensures consistent logging across the system.
+        # Example:
+        # upload_log({"event": message, "data": data, "level": level})
+
+    def process_ip(self, ip_str):
+        """
+        Converts a string to an IP address object.
+        Logs success or errors using log_event and indicates where logs should be uploaded.
+        """
+        try:
+            ip_obj = ipaddress.ip_address(ip_str)
+            self.log_event("info", f"Successfully processed IP: {ip_str}", {"ip": ip_str, "status": "success"})
+            # TODO: Upload this success event to the DB.
+            # Reason: Tracking each valid IP processed is useful for audit trails and debugging.
+            # upload_log({"event": "ip_processed", "ip": ip_str, "status": "success"})
+            return ip_obj
+        except ValueError as e:
+            self.log_event("error", f"Error processing IP {ip_str}: {e}", {"ip": ip_str, "status": "error", "error": str(e)})
+            # TODO: Upload this error event to the DB.
+            # Reason: Capturing parsing errors is essential for diagnosing data issues or security concerns.
+            upload_log({"event": "ip_processed", "ip": ip_str, "status": "error", "error": str(e)})
+            raise e
+
+    def check_network(self, ip_str, network_str):
+        """
+        Checks if an IP address is part of a given network.
+        Logs the result using log_event and marks where to upload the outcome.
+        """
+        ip_obj = self.process_ip(ip_str)
+        network = ipaddress.ip_network(network_str)
+        if ip_obj in network:
+            self.log_event("info", f"IP {ip_str} is within network {network_str}", {"ip": ip_str, "network": network_str, "result": "in"})
+            # TODO: Upload network membership check result to DB.
+            # Reason: Keeping a record of network validations can be essential for monitoring access policies.
+            return True
+        else:
+            self.log_event("info", f"IP {ip_str} is NOT within network {network_str}", {"ip": ip_str, "network": network_str, "result": "not in"})
+            # TODO: Upload network membership check result to DB.
+            print(f"[-] Logging both positive and negative checks ensures full traceability of network assessments.")
+            return False
+
+    def analyze_traffic(self, data):
+        """
+        Analyzes network traffic data.
+        This is a placeholder for your machine learning logic.
+        Logs important events, results, and errors for future reference using log_event.
+        """
+        self.log_event("info", "Starting network traffic analysis.", {"data": data})
+        # TODO: Upload an analysis start event to the DB with relevant metadata.
+        # Reason: Tracking the beginning of an analysis session can help correlate logs with ML predictions.
+        try:
+            # Placeholder for machine learning or analysis logic:
+            result = {}  # Imagine this is the result from some ML model
+            self.log_event("info", f"Analysis result: {result}", {"result": result})
+            # TODO: Upload the analysis result to the DB.
+            # Reason: Storing analysis results allows historical comparison and further data mining.
+            # upload_log({"event": "analysis_completed", "result": result})
+            return result
+        except Exception as e:
+            self.log_event("error", f"Error during traffic analysis: {e}", {"error": str(e)})
+            # TODO: Upload the error details to the DB for further investigation.
+            # Reason: Logging exceptions in ML analysis is critical for troubleshooting model failures or data issues.
+            # upload_log({"event": "analysis_error", "error": str(e)})
+            raise e
+
+    def run(self):
+        """
+        Main method that executes the overall workflow of the analyzer.
+        Logs the process lifecycle and indicates where to upload these events.
+        """
+        
+        self.log_event("info", "Starting the Network Analysis and Machine Learning Process")
+
+        # TODO: Upload a process start event to the DB.
+        # Reason: A startup log helps monitor system uptime and identify when processes are initiated.
+        # upload_log({"event": "process_start", "timestamp": "CURRENT_TIMESTAMP"})
+
+        # Example usage of the methods:
+        ip_str = "192.168.1.1"
+        network_str = "192.168.1.0/24"
+        self.check_network(ip_str, network_str)
+
+        # Placeholder for actual network traffic data to analyze:
+        data = {}
+        self.analyze_traffic(data)
+
+        self.log_event("info", "Completed the Network Analysis process")
+        # TODO: Upload a process end event to the DB.
+        # Reason: End logs provide a clear boundary for a process session, useful in long-running applications.
+        # upload_log({"event": "process_end", "timestamp": "CURRENT_TIMESTAMP"})
+
+
+#------ DB ------ 
+## TODO: REFACTOR INTO CLASS - METHODS
 # Function to create a SQLite database and a results table
 def create_database(db_name):
     # Connect to the SQLite database (it will be created if it doesn't exist)
@@ -59,16 +186,6 @@ def upload_result(db_name, name, score):
     conn.commit()
     conn.close()
     print(f"Result uploaded: {name} scored {score}.")
-
-# Example usage
-if __name__ == "__main__":
-    db_name = 'results.db'
-    create_database(db_name)
-    
-    # Uploading some sample results
-    upload_result(db_name, 'Alice', 95)
-    upload_result(db_name, 'Bob', 87)
-    
 
 # ---- Tool Description Utility ----
 
@@ -1142,4 +1259,7 @@ def main():
 
 
 if __name__ == "__main__":
+    create_database("sasquach")
+    self.log_event("info", "Starting the Network Analysis and Machine Learning Process")
+
     main()
